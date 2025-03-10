@@ -8,9 +8,11 @@ const con = mysql.createConnection({
     user: process.env.RAILWAY_DB_USER,
     password: process.env.RAILWAY_DB_PASSWORD,
     database: process.env.RAILWAY_DB_NAME,
-    port: process.env.RAILWAY_DB_PORT
+    port: process.env.RAILWAY_DB_PORT,
+    ssl: {
+        rejectUnauthorized: true
+    }
 });
-
 con.connect((err) => {
     if (err) {
         console.error("Error al conectar a la base de datos:", err);
