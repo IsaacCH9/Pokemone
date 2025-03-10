@@ -1,12 +1,13 @@
 const express = require("express");
 const mysql = require("mysql2");
-require("dotenv").config();
+require('dotenv').config();
 
 const con = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    host: process.env.RAILWAY_DB_HOST,
+    user: process.env.RAILWAY_DB_USER,
+    password: process.env.RAILWAY_DB_PASSWORD,
+    database: process.env.RAILWAY_DB_NAME,
+    port: process.env.RAILWAY_DB_PORT
 });
 
 con.connect((err) => {
