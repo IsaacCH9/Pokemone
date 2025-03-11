@@ -1,13 +1,28 @@
 {
-  "name": "pokemon-app",
+  "name": "y",
   "version": "1.0.0",
   "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^3.9.1",
-    "dotenv": "^16.4.1",
-    "body-parser": "^1.20.2"
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-validator": "^7.2.1",
+    "mysql2": "^3.13.0",
+    "sanitize-html": "^2.14.0"
   },
   "scripts": {
-    "start": "node app.js"
-  }
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IsaacCH9/Pokemon.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IsaacCH9/Pokemon/issues"
+  },
+  "homepage": "https://github.com/IsaacCH9/Pokemon#readme",
+  "description": ""
 }

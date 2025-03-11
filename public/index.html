@@ -6,103 +6,101 @@
     <title>Registro de Pokemones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-<script>
-    function actualizarTabla() {
-    fetch('/obtenerPokemones')
-        .then(response => response.json())
-        .then(pokemones => {
-            const tbody = document.getElementById('pokemon-table-body');
-            tbody.innerHTML = '';
-
-            pokemones.forEach(pokemon => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${pokemon.id}</td>
-                        <td>${pokemon.nombre}</td>
-                        <td>${pokemon.especie}</td>
-                        <td>${pokemon.tipo}</td>
-                        <td>${pokemon.nivel}</td>
-                        <td>${pokemon.habilidad}</td>
-                        <td>${pokemon.entrenador}</td>
-                        <td>${pokemon.edad}</td>
-                        <td>${pokemon.region}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})">
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        })
-        .catch(error => console.error("Error al obtener la lista de Pokémon:", error));
-}
-
-
-    
-        // Actualizar tabla cada 5 segundos
-        setInterval(actualizarTabla, 5000);
-    
-        // Cargar datos iniciales
-        document.addEventListener('DOMContentLoaded', actualizarTabla);
-            </script>
 </head>
 <body class="bg-light">
-<!-- Modal para Editar Pokémon -->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="editarModalLabel">Editar Pokémon</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editar-form">
-                    <input type="hidden" id="edit-id">
-                    <div class="mb-3">
-                        <label for="edit-nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="edit-nombre" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-especie" class="form-label">Especie</label>
-                        <input type="text" class="form-control" id="edit-especie" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-tipo" class="form-label">Tipo</label>
-                        <input type="text" class="form-control" id="edit-tipo" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-nivel" class="form-label">Nivel</label>
-                        <input type="number" class="form-control" id="edit-nivel" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-habilidad" class="form-label">Habilidad</label>
-                        <input type="text" class="form-control" id="edit-habilidad" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-entrenador" class="form-label">Entrenador</label>
-                        <input type="text" class="form-control" id="edit-entrenador" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-edad" class="form-label">Edad</label>
-                        <input type="number" class="form-control" id="edit-edad" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-region" class="form-label">Región</label>
-                        <input type="text" class="form-control" id="edit-region" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-warning text-white" onclick="actualizarPokemon()">Guardar Cambios</button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="bi bi-box"></i> Sistema Pokémon</a>
+        </div>
+    </nav>
+
+    <!-- Modal para Editar -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> Editar Pokémon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">Modifica los datos del Pokémon:</p>
+                    <form id="editForm">
+                        <input type="hidden" id="editId">
+                        <div class="mb-2">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control form-control-sm" id="editNombre">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Especie</label>
+                            <input type="text" class="form-control form-control-sm" id="editEspecie">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Tipo</label>
+                            <input type="text" class="form-control form-control-sm" id="editTipo">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Nivel</label>
+                            <input type="number" class="form-control form-control-sm" id="editNivel">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Habilidad</label>
+                            <input type="text" class="form-control form-control-sm" id="editHabilidad">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Entrenador</label>
+                            <input type="text" class="form-control form-control-sm" id="editEntrenador">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Edad</label>
+                            <input type="number" class="form-control form-control-sm" id="editEdad">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Región</label>
+                            <input type="text" class="form-control form-control-sm" id="editRegion">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning text-white" onclick="confirmarEdicion()">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para Eliminar -->
+    <!-- Modal de Confirmación de Edición -->
+    <div class="modal fade" id="confirmarEditModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirmar Cambios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de guardar los cambios?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-warning text-white" onclick="guardarCambios()">
+                        <i class="bi bi-check-circle"></i> Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contenido Principal -->
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Formulario de Registro -->
+            <div class="col-md-6">
+    
+    <!-- Modal para Eliminar -->
 <div class="modal fade" id="eliminarModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -125,100 +123,9 @@
         </div>
     </div>
 </div>
-<!-- Agregar estas funciones JavaScript -->
+
+    
 <script>
-function actualizarTabla() {
-        fetch('/obtenerPokemones')
-            .then(response => response.text())
-            .then(data => {
-                const pokemones = JSON.parse(data);
-                const tbody = document.getElementById('pokemon-table-body');
-                tbody.innerHTML = '';
-            
-                pokemones.forEach(pokemon => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${pokemon.id}</td>
-                            <td>${pokemon.nombre}</td>
-                            <td>${pokemon.tipo}</td>
-                            <td>${pokemon.nivel}</td>
-                            <td>${pokemon.habilidad}</td>
-                            <td>${pokemon.entrenador}</td>
-                            <td>${pokemon.edad}</td>
-                            <td>${pokemon.region}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="eliminarPokemon(${pokemon.id})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-}
-
-function editarPokemon(id) {
-    fetch(`/obtenerPokemon/${id}`)
-        .then(response => response.json())
-        .then(pokemon => {
-            document.getElementById('edit-id').value = pokemon.id;
-            document.getElementById('edit-nombre').value = pokemon.nombre;
-            document.getElementById('edit-especie').value = pokemon.especie;
-            document.getElementById('edit-tipo').value = pokemon.tipo;
-            document.getElementById('edit-nivel').value = pokemon.nivel;
-            document.getElementById('edit-habilidad').value = pokemon.habilidad;
-            document.getElementById('edit-entrenador').value = pokemon.entrenador;
-            document.getElementById('edit-edad').value = pokemon.edad;
-            document.getElementById('edit-region').value = pokemon.region;
-
-            // Mostrar el modal
-            new bootstrap.Modal(document.getElementById('editarModal')).show();
-        })
-        .catch(error => console.error("Error al obtener los datos del Pokémon:", error));
-}
-
-
-function actualizarPokemon() {
-    const id = document.getElementById('edit-id').value;
-    const pokemon = {
-        nombre: document.getElementById('edit-nombre').value,
-        especie: document.getElementById('edit-especie').value,
-        tipo: document.getElementById('edit-tipo').value,
-        nivel: document.getElementById('edit-nivel').value,
-        habilidad: document.getElementById('edit-habilidad').value,
-        entrenador: document.getElementById('edit-entrenador').value,
-        edad: document.getElementById('edit-edad').value,
-        region: document.getElementById('edit-region').value
-    };
-
-    fetch(`/actualizarPokemon/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pokemon)
-    })
-    .then(response => response.json())
-    .then(result => {
-        // Ocultar el modal después de actualizar
-        bootstrap.Modal.getInstance(document.getElementById('editarModal')).hide();
-        
-        // Actualizar la tabla
-        actualizarTabla();
-
-        // Mensaje de éxito
-        alert(result.message);
-    })
-    .catch(error => {
-        console.error("Error al actualizar Pokémon:", error);
-        alert("Hubo un error al actualizar el Pokémon.");
-    });
-}
-
-
 function eliminarPokemon(id) {
     const modal = new bootstrap.Modal(document.getElementById('eliminarModal'));
     const btnConfirmar = document.getElementById('btn-confirmar-eliminar');
@@ -236,17 +143,8 @@ function eliminarPokemon(id) {
     };
     
     modal.show();
-}</script>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#"><i class="bi bi-box"></i> Sistema Pokémon</a>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        <div class="row">
-            <!-- Sección para registrar Pokémon -->
-            <div class="col-md-6">
+}
+</script>
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="bi bi-pencil"></i> Registrar Pokémon</h5>
@@ -291,57 +189,16 @@ function eliminarPokemon(id) {
                         </form>
                     </div>
                 </div>
-
-<script>
-async function submitForm(event) {
-    event.preventDefault();
-    
-    const formData = {
-        nombre: document.getElementById('nombre').value,
-        especie: document.getElementById('especie').value,
-        tipo: document.getElementById('tipo').value,
-        nivel: document.getElementById('nivel').value,
-        habilidad: document.getElementById('habilidad').value,
-        entrenador: document.getElementById('entrenador').value,
-        edad: document.getElementById('edad').value,
-        region: document.getElementById('region').value // Make sure this field exists
-    };
-
-    console.log('Datos a enviar:', formData); // Add this line to verify data
-
-    try {
-        const response = await fetch('/agregarPokemon', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-            alert(result.message);
-            document.getElementById('pokemon-form').reset();
-            actualizarTabla();
-        } else {
-            alert(result.error || 'Error al guardar');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al procesar la solicitud');
-    }
-}
-
-</script>            </div>              <!-- Sección para mostrar Pokémon registrados -->
-              <div class="col-md-6">
-                  <div class="card shadow">
-                      <div class="card-header bg-success text-white">
-                          <h5 class="mb-0"><i class="bi bi-list-ul"></i> Lista de Pokemones</h5>
-                      </div>
-                      <div class="card-body">
-                          <div class="table-responsive">
-                              <table class="table table-hover">
+            </div>
+            <!-- Tabla de Pokémon -->
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-list-ul"></i> Lista de Pokemones</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>ID</th>
@@ -356,70 +213,30 @@ async function submitForm(event) {
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
-                                
-                                  <tbody id="pokemon-table-body"></tbody>
-                              </table>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              </div>
+                                <tbody id="pokemon-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Actualiza la función actualizarTabla en el script -->
-<script>
-function actualizarTabla() {
-    fetch('/obtenerPokemones')
-        .then(response => response.json())  // Changed from response.text()
-        .then(pokemones => {
-            const tbody = document.getElementById('pokemon-table-body');
-            tbody.innerHTML = '';
-            
-            pokemones.forEach(pokemon => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${pokemon.id}</td>
-                        <td>${pokemon.nombre}</td>
-                        <td>${pokemon.especie}</td>
-                        <td>${pokemon.tipo}</td>
-                        <td>${pokemon.nivel}</td>
-                        <td>${pokemon.habilidad}</td>
-                        <td>${pokemon.entrenador}</td>
-                        <td>${pokemon.edad}</td>
-                        <td>${pokemon.region}</td>
-                        <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="eliminarPokemon(${pokemon.id})" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-        })
-        .catch(error => console.error('Error:', error));
-}
-</script>              </div>
-      <!-- Coloca esto justo antes del cierre del body -->
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-        // Función para actualizar la tabla
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
         function actualizarTabla() {
             fetch('/obtenerPokemones')
-                .then(response => response.text())
-                .then(data => {
-                    const pokemones = JSON.parse(data);
+                .then(response => response.json())
+                .then(pokemones => {
                     const tbody = document.getElementById('pokemon-table-body');
                     tbody.innerHTML = '';
-            
+                    
                     pokemones.forEach(pokemon => {
                         tbody.innerHTML += `
                             <tr>
                                 <td>${pokemon.id}</td>
                                 <td>${pokemon.nombre}</td>
+                                <td>${pokemon.especie}</td>
                                 <td>${pokemon.tipo}</td>
                                 <td>${pokemon.nivel}</td>
                                 <td>${pokemon.habilidad}</td>
@@ -427,10 +244,16 @@ function actualizarTabla() {
                                 <td>${pokemon.edad}</td>
                                 <td>${pokemon.region}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})">
+                                    <button class="btn btn-warning btn-sm" 
+                                            onclick="editarPokemon(${pokemon.id})"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editModal">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="eliminarPokemon(${pokemon.id})">
+                                    <button class="btn btn-danger btn-sm" 
+                                            onclick="eliminarPokemon(${pokemon.id})"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#eliminarModal">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -440,71 +263,64 @@ function actualizarTabla() {
                 });
         }
 
-        // Función para editar Pokémon
         function editarPokemon(id) {
+            console.log("Se hizo clic en Editar para el Pokémon con ID:", id); // <-- Agregar esto para ver si se ejecuta
             fetch(`/obtenerPokemon/${id}`)
                 .then(response => response.json())
                 .then(pokemon => {
-                    document.getElementById('edit-id').value = pokemon.id;
-                    document.getElementById('edit-nombre').value = pokemon.nombre;
-                    document.getElementById('edit-tipo').value = pokemon.tipo;
-                    document.getElementById('edit-nivel').value = pokemon.nivel;
-                    document.getElementById('edit-habilidad').value = pokemon.habilidad;
-                    document.getElementById('edit-entrenador').value = pokemon.entrenador;
-                    document.getElementById('edit-edad').value = pokemon.edad;
-                    document.getElementById('edit-region').value = pokemon.region;
-            
-                    new bootstrap.Modal(document.getElementById('editarModal')).show();
+                    document.getElementById('editId').value = pokemon.id;
+                    document.getElementById('editNombre').value = pokemon.nombre;
+                    document.getElementById('editEspecie').value = pokemon.especie;
+                    document.getElementById('editTipo').value = pokemon.tipo;
+                    document.getElementById('editNivel').value = pokemon.nivel;
+                    document.getElementById('editHabilidad').value = pokemon.habilidad;
+                    document.getElementById('editEntrenador').value = pokemon.entrenador;
+                    document.getElementById('editEdad').value = pokemon.edad;
+                    document.getElementById('editRegion').value = pokemon.region;
+                    
+                    new bootstrap.Modal(document.getElementById('editModal')).show();
                 });
         }
 
-        // Función para actualizar Pokémon
-        function actualizarPokemon() {
-    const id = document.getElementById('edit-id').value;
-    const pokemon = {
-        nombre: document.getElementById('edit-nombre').value,
-        especie: document.getElementById('edit-especie').value,
-        tipo: document.getElementById('edit-tipo').value,
-        nivel: document.getElementById('edit-nivel').value,
-        habilidad: document.getElementById('edit-habilidad').value,
-        entrenador: document.getElementById('edit-entrenador').value,
-        edad: document.getElementById('edit-edad').value,
-        region: document.getElementById('edit-region').value
-    };
-
-    fetch(`/actualizarPokemon/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pokemon)
-    })
-    .then(response => response.text())
-    .then(result => {
-        bootstrap.Modal.getInstance(document.getElementById('editarModal')).hide();
-        actualizarTabla();
-        alert('Pokémon actualizado exitosamente');
-    });
+        function confirmarEdicion() {
+    const confirmarModal = new bootstrap.Modal(document.getElementById('confirmarEditModal'));
+    confirmarModal.show();
 }
 
+function guardarCambios() {
+    const id = document.getElementById('editId').value;
+    const pokemon = {
+        nombre: document.getElementById('editNombre').value,
+        especie: document.getElementById('editEspecie').value,
+        tipo: document.getElementById('editTipo').value,
+        nivel: document.getElementById('editNivel').value,
+        habilidad: document.getElementById('editHabilidad').value,
+        entrenador: document.getElementById('editEntrenador').value,
+        edad: document.getElementById('editEdad').value,
+        region: document.getElementById('editRegion').value
+    };
 
-        // Función para eliminar Pokémon
-        function eliminarPokemon(id) {
-            if (confirm('¿Estás seguro de eliminar este Pokémon?')) {
-                fetch(`/eliminarPokemon/${id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => response.text())
-                .then(result => {
-                    actualizarTabla();
-                    alert('Pokémon eliminado exitosamente');
-                });
-            }
+    fetch(`/editarPokemon/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pokemon)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('confirmarEditModal')).hide();
+            actualizarTabla();
+            alert(result.message);
+        } else {
+            alert("Error: " + result.error);
         }
-
-        // Inicializar la tabla y actualizarla periódicamente
-        document.addEventListener('DOMContentLoaded', actualizarTabla);
-        setInterval(actualizarTabla, 5000);
+    })
+    .catch(error => {
+        console.error("Error en la actualización:", error);
+        alert("Error al actualizar el Pokémon.");
+    });
+}
 
         async function submitForm(event) {
             event.preventDefault();
@@ -542,4 +358,11 @@ function actualizarTabla() {
                 console.error('Error:', error);
                 alert('Error al procesar la solicitud');
             }
-        }        </script>
+        }
+    </script>
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', actualizarTabla);
+    setInterval(actualizarTabla, 5000);
+</script>
