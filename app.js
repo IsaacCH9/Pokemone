@@ -13,10 +13,10 @@ const JWT_EXPIRY = '2h';
 const dotenv = require('dotenv');
 dotenv.config();
 const pool = mysql.createPool({
-    host: 'crud-pokemon-carbajal-08b7.b.aivencloud.com',
-    user: 'avnadmin',
+    host: process.env.HOST,
+    user: process.env.USER,
     password: process.env.PASSWORD,
-    database: 'pokemones',
+    database: process.env.DATABASE,
     port: 13387
 });
 
