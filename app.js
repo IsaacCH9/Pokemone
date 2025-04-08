@@ -11,10 +11,11 @@ app.use(express.static('public'));
 const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 const JWT_EXPIRY = '2h';
 
+const password = 'AVNS_vZ7ZpAP23at6PgDGrr7';
 const pool = mysql.createPool({
     host: 'crud-pokemon-carbajal-08b7.b.aivencloud.com',
     user: 'avnadmin',
-    password: 'AVNS_vZ7ZpAP23at6PgDGrr7',
+    password: password,
     database: 'pokemones',
     port: 13387
 });
