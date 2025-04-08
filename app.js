@@ -12,10 +12,11 @@ const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 const JWT_EXPIRY = '2h';
 
 const pool = mysql.createPool({
-    host: '0.0.0.0',
-    user: 'root',
-    password: 'W.34bjywe1',
+    host: 'crud-pokemon-carbajal-08b7.b.aivencloud.com',
+    user: 'avnadmin',
+    password: 'AVNS_vZ7ZpAP23at6PgDGrr7',
     database: 'pokemones',
+    port: 13387
 });
 
 app.use(cookieParser());
