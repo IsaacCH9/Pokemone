@@ -20,9 +20,7 @@ const pool = mysql.createPool({
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// Añadir estas importaciones al principio del archivo app.js
 const saltRounds = 10;
-// Añade esto a tu app.js, justo antes de las demás rutas
 app.get('/', (req, res) => {
     res.sendFile('index.html', { root: './public' });
 });
@@ -363,5 +361,5 @@ app.put(
 // Iniciar servidor
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0',() => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
+    console.log(`Servidor escuchando en http://0.0.0.0:3000`);
 });
