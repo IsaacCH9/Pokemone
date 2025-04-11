@@ -12,7 +12,7 @@ const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 const JWT_EXPIRY = '2h';
 
 const pool = mysql.createPool({
-    host: '0.0.0.0',
+    host: 'localhost',
     user: 'root',
     password: 'W.34bjywe1',
     database: 'pokemones',
