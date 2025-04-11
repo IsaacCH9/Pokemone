@@ -19,12 +19,6 @@ CREATE TABLE IF NOT EXISTS pokemon (
     entrenador VARCHAR(50) NOT NULL,
     edad INT NOT NULL CHECK (edad BETWEEN 1 AND 120),
     region VARCHAR(50) NOT NULL,
+    id_usuario INT,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 );
-
--- Inserción de datos
-INSERT INTO pokemon (nombre, especie, tipo, nivel, habilidad, entrenador, edad, region) VALUES 
-('Pikachu', 'Ratón', 'Eléctrico', 35, 'Electricidad estática', 'Ash', 10, 'Kanto'),
-('Charmander', 'Lagarto', 'Fuego', 25, 'Mar de llamas', 'Red', 12, 'Kanto'),
-('Squirtle', 'Tortuga', 'Agua', 20, 'Torrente', 'Gary', 11, 'Kanto'),
-('Bulbasaur', 'Semilla', 'Planta/Veneno', 30, 'Espesura', 'Misty', 9, 'Kanto');

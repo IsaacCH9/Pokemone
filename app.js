@@ -10,14 +10,11 @@ const cookieParser = require('cookie-parser');
 app.use(express.static('public'));
 const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 const JWT_EXPIRY = '2h';
-const dotenv = require('dotenv');
-dotenv.config();
-const pool = mysql.createPool({
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-    port: 13387
+const pool = mysql.createPool({ 
+    host: 'localhost',
+    user: 'root',
+    password: 'W.34bjywe1',
+    database: 'pokemones'
 });
 
 app.use(cookieParser());
@@ -63,13 +60,13 @@ app.post(
             .matches(/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/).withMessage("El nombre solo puede contener letras y espacios")
             .escape(),
         body("correo")
-            .isEmail().withMessage("Ingrese un correo electrónico válido")
+            .isEmail().withMessage("El formato del correo electrónico no es válido")
             .normalizeEmail()
             .custom(async (value) => {
                 // Verificar que el correo no exista ya
                 const [results] = await pool.promise().query("SELECT * FROM usuarios WHERE correo = ?", [value]);
                 if (results.length > 0) {
-                    throw new Error("El correo ya está registrado");
+                    throw new Error("Usuario ya registrado, pruebe con crear uno nuevo");
                 }
                 return true;
             }),
@@ -80,8 +77,10 @@ app.post(
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            const primerError = errors.array()[0];
             return res.status(400).json({ 
-                error: "Datos inválidos", 
+                error: primerError.msg, // Mensaje específico del error
+                campo: primerError.param, // Campo que causó el error
                 detalles: errors.array().map(err => ({ campo: err.param, mensaje: err.msg }))
             });
         }
@@ -98,10 +97,41 @@ app.post(
                 [nombre, correo, hash]
             );
             
-            res.json({ success: true, message: "Usuario registrado exitosamente" });
+            // Crear token para el usuario recién registrado
+            const token = jwt.sign(
+                { 
+                    id: result.insertId, 
+                    correo: correo,
+                    nombre: nombre
+                }, 
+                JWT_SECRET,
+                { expiresIn: JWT_EXPIRY }
+            );
+
+            // Establecer cookie y devolver información necesaria
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7200000
+            });
+
+            // Devolver éxito con token e indicador de nuevo usuario
+            res.json({ 
+                success: true, 
+                message: "Usuario registrado exitosamente",
+                id_usuario: result.insertId,
+                nombre: nombre,
+                correo: correo,
+                token: token,
+                newUser: true
+            });
         } catch (error) {
             console.error("Error al registrar usuario:", error);
-            res.status(500).json({ error: "Error en el servidor al registrar usuario" });
+            if (error.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({ error: "Este correo electrónico ya está registrado" });
+            }
+            res.status(500).json({ error: "Ocurrió un error al registrar el usuario. Por favor, inténtelo de nuevo." });
         }
     }
 );
@@ -117,7 +147,8 @@ app.post(
         console.log("Intento de login:", req.body.correo);
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ error: "Datos inválidos", detalles: errors.array() });
+            const primerError = errors.array()[0];
+            return res.status(400).json({ error: primerError.msg });
         }
 
         const { correo, password } = req.body;
@@ -143,7 +174,7 @@ app.post(
                 }
 
                 if (!match) {
-                    return res.status(401).json({ error: "Correo o contraseña incorrectos" });
+                    return res.status(401).json({ error: "Contraseña incorrecta" });
                 }
                 
                 const token = jwt.sign(

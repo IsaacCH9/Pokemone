@@ -11,12 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const errorMessage = document.getElementById("errorMessage");
         const successMessage = document.getElementById("successMessage");
 
-        // Validar que las contraseñas coincidan
+        errorMessage.textContent = "";
+        successMessage.textContent = "";
+        
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+
         if (password !== confirmPassword) {
             errorMessage.textContent = "Las contraseñas no coinciden";
-            setTimeout(() => {
-                errorMessage.textContent = "";
-            }, 3000);
+            document.getElementById("confirmPassword").classList.add('is-invalid');
             return;
         }
 
@@ -32,23 +36,39 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (response.ok) {
-                successMessage.textContent = "Registro exitoso. Redirigiendo al login...";
-                registerForm.reset();
-                setTimeout(() => {
-                    window.location.href = "Login.html";
-                }, 2000);
+                if (data.token) {
+                    sessionStorage.setItem("authToken", data.token);
+                    sessionStorage.setItem("userId", data.id_usuario);
+                    sessionStorage.setItem("userName", data.nombre);
+                    sessionStorage.setItem("isLoggedIn", "true");
+                    
+                    window.location.href = "/";
+                } else {
+                    successMessage.textContent = "Registro exitoso. Redirigiendo al login...";
+                    registerForm.reset();
+                    setTimeout(() => {
+                        window.location.href = "Login.html";
+                    }, 2000);
+                }
             } else {
                 errorMessage.textContent = data.error || "Error en el registro";
-                setTimeout(() => {
-                    errorMessage.textContent = "";
-                }, 3000);
+                
+                if (data.campo) {
+                    const campoInput = document.getElementById(data.campo);
+                    if (campoInput) {
+                        campoInput.classList.add('is-invalid');
+                        
+                        const feedbackDiv = document.createElement('div');
+                        feedbackDiv.className = 'invalid-feedback';
+                        feedbackDiv.textContent = data.error;
+                        
+                        campoInput.parentNode.appendChild(feedbackDiv);
+                    }
+                }
             }
         } catch (error) {
             console.error("Error:", error);
             errorMessage.textContent = "Error de conexión. Intente de nuevo.";
-            setTimeout(() => {
-                errorMessage.textContent = "";
-            }, 3000);
         }
     });
 });
