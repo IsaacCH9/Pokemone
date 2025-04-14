@@ -40,25 +40,29 @@
             background-color: #cc0000 !important;
             border-color: #cc0000 !important;
         }
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #777;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <!-- Agregar en la navbar del dashboard.html -->
-<div class="ms-auto">
-    <button class="btn btn-light" onclick="cerrarSesion()">
-        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-    </button>
-</div>
-
-<script>
-function cerrarSesion() {
-    sessionStorage.removeItem("isLoggedIn");
-    window.location.href = "index.html";
-}
-</script>
         <div class="container">
-            <a class="navbar-brand text-white" href="#"><i class="bi bi-box"></i> Sistema Pokémon</a>
+            <a class="navbar-brand text-white" href="#">
+                <img    src="img/Pokeball.png" alt="logito" height="35"> Sistema Pokémon
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <span id="userNameDisplay" class="navbar-text text-white me-3"></span>
+                <button class="btn btn-light" onclick="cerrarSesion()">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -117,6 +121,10 @@ function cerrarSesion() {
                         <h5><i class="bi bi-list-ul"></i> Lista de Pokemones</h5>
                     </div>
                     <div class="card-body">
+                        <div id="empty-pokemon-message" class="empty-message d-none">
+                            <i class="bi bi-exclamation-circle fs-1 d-block mb-3"></i>
+                            No has registrado ningún Pokémon aún. ¡Comienza añadiendo tu primer Pokémon!
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead class="table-dark">
@@ -191,179 +199,228 @@ function cerrarSesion() {
     </div>
 
     <script>
-
-function submitForm(event) {
-    event.preventDefault();
-
-    const nombre = document.getElementById("nombre").value;
-    const especie = document.getElementById("especie").value;
-    const tipo = document.getElementById("tipo").value;
-    const nivel = document.getElementById("nivel").value;
-    const habilidad = document.getElementById("habilidad").value;
-    const entrenador = document.getElementById("entrenador").value;
-    const edad = document.getElementById("edad").value;
-    const region = document.getElementById("region").value;
-    const id_usuario = sessionStorage.getItem("userId");
-
-    const regexTexto = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{1,50}$/;
-    const regexNumero = /^\d+$/;
-
-    if (!regexTexto.test(nombre)) {
-        alert("Nombre inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(especie)) {
-        alert("Especie inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(tipo)) {
-        alert("Tipo inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexNumero.test(nivel) || nivel < 1 || nivel > 100) {
-        alert("Nivel inválido. Debe ser un número entre 1 y 100.");
-        return;
-    }
-    if (!regexTexto.test(habilidad)) {
-        alert("Habilidad inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(entrenador)) {
-        alert("Entrenador inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexNumero.test(edad) || edad < 1 || edad > 120) {
-        alert("Edad inválida. Debe ser un número entre 1 y 120.");
-        return;
-    }
-    if (!regexTexto.test(region)) {
-        alert("Región inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-
-
-    if (!nombre || !especie || !tipo || !nivel || !habilidad || !entrenador || !edad || !region) {
-        alert("Todos los campos son obligatorios.");
-        return;
-    }
-
-    fetch("/agregarPokemon", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ 
-            nombre, 
-            especie, 
-            tipo, 
-            nivel, 
-            habilidad, 
-            entrenador, 
-            edad, 
-            region, 
-            id_usuario 
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Pokémon registrado con éxito!");
-            document.getElementById("pokemon-form").reset();
-            actualizarTabla();
-        } else {
-            alert("Error: " + data.error);
+        function cerrarSesion() {
+            sessionStorage.removeItem("isLoggedIn");
+            sessionStorage.removeItem("userId");
+            sessionStorage.removeItem("userName");
+            sessionStorage.removeItem("authToken");
+            window.location.href = "Login.html";
         }
-    })
-    .catch(error => console.error("Error:", error));
-}
 
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("pokemon-form");
+        function submitForm(event) {
+            event.preventDefault();
 
-    form.removeEventListener("submit", submitForm);
-    form.addEventListener("submit", submitForm);
-});
+            const nombre = document.getElementById("nombre").value;
+            const especie = document.getElementById("especie").value;
+            const tipo = document.getElementById("tipo").value;
+            const nivel = document.getElementById("nivel").value;
+            const habilidad = document.getElementById("habilidad").value;
+            const entrenador = document.getElementById("entrenador").value;
+            const edad = document.getElementById("edad").value;
+            const region = document.getElementById("region").value;
+            const id_usuario = sessionStorage.getItem("userId");
 
-function actualizarTabla() {
-    // Obtener el ID del usuario del sessionStorage
-    const id_usuario = sessionStorage.getItem("userId");
-    
-    fetchWithAuth(`/obtenerPokemones?id_usuario=${id_usuario}`)
-        .then(response => response.json())
-        .then(pokemones => {
-            const tbody = document.getElementById('pokemon-table-body');
-            tbody.innerHTML = '';
-            pokemones.forEach(pokemon => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${pokemon.nombre}</td>
-                        <td>${pokemon.especie}</td>
-                        <td>${pokemon.tipo}</td>
-                        <td>${pokemon.nivel}</td>
-                        <td>${pokemon.habilidad}</td>
-                        <td>${pokemon.entrenador}</td>
-                        <td>${pokemon.edad}</td>
-                        <td>${pokemon.region}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})">
-                                <i class="bi bi-pencil"></i> Editar
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="eliminarPokemon(${pokemon.id})">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </td>
-                    </tr>`;
+            const regexTexto = /^[A-Za-zÁÉÍÓÚÑáéíóúñ ]{1,50}$/;
+            const regexNumero = /^\d+$/;
+
+            if (!regexTexto.test(nombre)) {
+                alert("Nombre inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(especie)) {
+                alert("Especie inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(tipo)) {
+                alert("Tipo inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexNumero.test(nivel) || nivel < 1 || nivel > 100) {
+                alert("Nivel inválido. Debe ser un número entre 1 y 100.");
+                return;
+            }
+            if (!regexTexto.test(habilidad)) {
+                alert("Habilidad inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(entrenador)) {
+                alert("Entrenador inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexNumero.test(edad) || edad < 1 || edad > 120) {
+                alert("Edad inválida. Debe ser un número entre 1 y 120.");
+                return;
+            }
+            if (!regexTexto.test(region)) {
+                alert("Región inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+
+
+            if (!nombre || !especie || !tipo || !nivel || !habilidad || !entrenador || !edad || !region) {
+                alert("Todos los campos son obligatorios.");
+                return;
+            }
+
+            fetch("/agregarPokemon", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+                },
+                body: JSON.stringify({ 
+                    nombre, 
+                    especie, 
+                    tipo, 
+                    nivel, 
+                    habilidad, 
+                    entrenador, 
+                    edad, 
+                    region, 
+                    id_usuario 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Pokémon registrado con éxito!");
+                    document.getElementById("pokemon-form").reset();
+                    actualizarTabla();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Verificar autenticación
+            if (sessionStorage.getItem("isLoggedIn") !== "true") {
+                window.location.href = "Login.html";
+                return;
+            }
+
+            // Mostrar el nombre del usuario
+            const userName = sessionStorage.getItem("userName");
+            if (userName) {
+                document.getElementById("userNameDisplay").textContent = `Bienvenido, ${userName}`;
+            }
+
+            // Configurar el formulario
+            const form = document.getElementById("pokemon-form");
+            form.removeEventListener("submit", submitForm);
+            form.addEventListener("submit", submitForm);
+
+            // Cargar la tabla de pokemones
+            actualizarTabla();
+        });
+
+        function actualizarTabla() {
+            // Obtener el ID del usuario del sessionStorage
+            const id_usuario = sessionStorage.getItem("userId");
+            const token = sessionStorage.getItem("authToken");
+            
+            fetch(`/obtenerPokemones?id_usuario=${id_usuario}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(pokemones => {
+                const tbody = document.getElementById('pokemon-table-body');
+                const tableResponsive = document.querySelector('.table-responsive');
+                const emptyMessage = document.getElementById('empty-pokemon-message');
+                
+                tbody.innerHTML = '';
+                
+                if (pokemones.length === 0) {
+                    // Mostrar mensaje cuando no hay pokemones
+                    emptyMessage.classList.remove('d-none');
+                    tableResponsive.classList.add('d-none');
+                } else {
+                    // Ocultar mensaje y mostrar tabla cuando hay pokemones
+                    emptyMessage.classList.add('d-none');
+                    tableResponsive.classList.remove('d-none');
+                    
+                    pokemones.forEach(pokemon => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${pokemon.nombre}</td>
+                                <td>${pokemon.especie}</td>
+                                <td>${pokemon.tipo}</td>
+                                <td>${pokemon.nivel}</td>
+                                <td>${pokemon.habilidad}</td>
+                                <td>${pokemon.entrenador}</td>
+                                <td>${pokemon.edad}</td>
+                                <td>${pokemon.region}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarPokemon(${pokemon.id})">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="eliminarPokemon(${pokemon.id})">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error al obtener la lista de Pokémon:", error);
+                document.getElementById('empty-pokemon-message').classList.remove('d-none');
+                document.querySelector('.table-responsive').classList.add('d-none');
             });
-        })
-        .catch(error => console.error("Error al obtener la lista de Pokémon:", error));
-}
+        }
 
         function eliminarPokemon(id) {
-    if (!confirm("¿Estás seguro de que quieres eliminar este Pokémon?")) {
-        return;
-    }
+            if (!confirm("¿Estás seguro de que quieres eliminar este Pokémon?")) {
+                return;
+            }
 
-    fetch(`/eliminarPokemon/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
+            fetch(`/eliminarPokemon/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Pokémon eliminado con éxito!");
+                    actualizarTabla();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error al eliminar Pokémon:", error));
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Pokémon eliminado con éxito!");
-            actualizarTabla();
-        } else {
-            alert("Error: " + data.error);
-        }
-    })
-    .catch(error => console.error("Error al eliminar Pokémon:", error));
-}
-
-
 
         function editarPokemon(id) {
-            fetch(`/obtenerPokemon/${id}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("No se pudo obtener la información del Pokémon.");
-                    }
-                    return response.json();
-                })
-                .then(pokemon => {
-                    document.getElementById('editId').value = pokemon.id;
-                    document.getElementById('editNombre').value = pokemon.nombre;
-                    document.getElementById('editEspecie').value = pokemon.especie;
-                    document.getElementById('editTipo').value = pokemon.tipo;
-                    document.getElementById('editNivel').value = pokemon.nivel;
-                    document.getElementById('editHabilidad').value = pokemon.habilidad;
-                    document.getElementById('editEntrenador').value = pokemon.entrenador;
-                    document.getElementById('editEdad').value = pokemon.edad;
-                    document.getElementById('editRegion').value = pokemon.region;
-                    const modal = new bootstrap.Modal(document.getElementById('editModal'));
-                    modal.show();
-                });
+            fetch(`/obtenerPokemon/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No se pudo obtener la información del Pokémon.");
+                }
+                return response.json();
+            })
+            .then(pokemon => {
+                document.getElementById('editId').value = pokemon.id;
+                document.getElementById('editNombre').value = pokemon.nombre;
+                document.getElementById('editEspecie').value = pokemon.especie;
+                document.getElementById('editTipo').value = pokemon.tipo;
+                document.getElementById('editNivel').value = pokemon.nivel;
+                document.getElementById('editHabilidad').value = pokemon.habilidad;
+                document.getElementById('editEntrenador').value = pokemon.entrenador;
+                document.getElementById('editEdad').value = pokemon.edad;
+                document.getElementById('editRegion').value = pokemon.region;
+                const modal = new bootstrap.Modal(document.getElementById('editModal'));
+                modal.show();
+            });
         }
 
         function guardarCambios() {
@@ -382,98 +439,80 @@ function actualizarTabla() {
             const regexNumero = /^\d+$/;
 
             if (!id || isNaN(id)) {
-        alert("ID inválido.");
-        return;
-    }
-    if (!regexTexto.test(nombre)) {
-        alert("Nombre inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(especie)) {
-        alert("Especie inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(tipo)) {
-        alert("Tipo inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexNumero.test(nivel) || nivel < 1 || nivel > 100) {
-        alert("Nivel inválido. Debe ser un número entre 1 y 100.");
-        return;
-    }
-    if (!regexTexto.test(habilidad)) {
-        alert("Habilidad inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexTexto.test(entrenador)) {
-        alert("Entrenador inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
-    if (!regexNumero.test(edad) || edad < 1 || edad > 120) {
-        alert("Edad inválida. Debe ser un número entre 1 y 120.");
-        return;
-    }
-    if (!regexTexto.test(region)) {
-        alert("Región inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
-        return;
-    }
+                alert("ID inválido.");
+                return;
+            }
+            if (!regexTexto.test(nombre)) {
+                alert("Nombre inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(especie)) {
+                alert("Especie inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(tipo)) {
+                alert("Tipo inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexNumero.test(nivel) || nivel < 1 || nivel > 100) {
+                alert("Nivel inválido. Debe ser un número entre 1 y 100.");
+                return;
+            }
+            if (!regexTexto.test(habilidad)) {
+                alert("Habilidad inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexTexto.test(entrenador)) {
+                alert("Entrenador inválido. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
+            if (!regexNumero.test(edad) || edad < 1 || edad > 120) {
+                alert("Edad inválida. Debe ser un número entre 1 y 120.");
+                return;
+            }
+            if (!regexTexto.test(region)) {
+                alert("Región inválida. Solo se permiten letras y espacios (Máx. 50 caracteres).");
+                return;
+            }
 
             if (!id || !nombre || !especie || !tipo || !nivel || !habilidad || !entrenador || !edad || !region) {
-        alert("Todos los campos son obligatorios");
-        return;
-    }
-
-    fetch(`/actualizarPokemon/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ 
-            nombre,
-            especie,
-            tipo,
-            nivel,
-            habilidad,
-            entrenador,
-            edad,
-            region,
-            id_usuario
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Pokemon actualizado");
-            const modalElement = document.getElementById('editModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-
-            actualizarTabla();
-        } else {
-            alert("Error: " + data.error);
-        }
-    })
-    .catch(error => console.error("Error:", error));
-}
-
-        document.addEventListener("DOMContentLoaded", actualizarTabla);
-    </script>
-    <script>
-        if (sessionStorage.getItem("isLoggedIn") !== "true") {
-            window.location.href = "Login.html";
-        }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Mostrar el nombre del usuario
-            const userName = sessionStorage.getItem("userName");
-            if (userName) {
-                const userNameElement = document.createElement("span");
-                userNameElement.className = "navbar-text text-white mr-3";
-                userNameElement.textContent = `Bienvenido, ${userName}`;
-                document.querySelector(".navbar .container").appendChild(userNameElement);
+                alert("Todos los campos son obligatorios");
+                return;
             }
-        });
+
+            fetch(`/actualizarPokemon/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+                },
+                body: JSON.stringify({ 
+                    nombre,
+                    especie,
+                    tipo,
+                    nivel,
+                    habilidad,
+                    entrenador,
+                    edad,
+                    region,
+                    id_usuario
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Pokemon actualizado");
+                    const modalElement = document.getElementById('editModal');
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+
+                    actualizarTabla();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
     </script>
 </body>
 </html>
