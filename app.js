@@ -11,10 +11,7 @@ app.use(express.static('public'));
 const JWT_SECRET = 'tu_clave_secreta_muy_segura';
 const JWT_EXPIRY = '2h';
 const pool = mysql.createPool({ 
-    host: 'localhost',
-    user: 'root',
-    password: 'W.34bjywe1',
-    database: 'pokemones'
+   // Configuración de la conexión a la base de datos
 });
 
 app.use(cookieParser());
